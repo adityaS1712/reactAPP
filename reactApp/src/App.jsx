@@ -1,65 +1,48 @@
-import React, { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import axios from "axios";
-import './App.css'
-
-let counter=4;
+import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios"
 
 function App() {
-  const [todos,setTodos]=useState([])
-  //cannot async the useEffect function
-  //use promises
-  useEffect(()=>{
-    setInterval(()=>{
-      axios.get("https://sum-server.100xdevs.com/todos")
-      .then(function(response){
-        setTodos(response.data.todos)
-      })
+  // state? useState
+  const [selectedId, setSelectedId] = useState(1);
+
+  return <div>
+    <button onClick={() => setSelectedId(1)}>1</button>
     
-    },10000)
+    <button onClick={function() {
+      setSelectedId(2);
+    }}>2</button>
+    
+    <button onClick={function() {
+      setSelectedId(3);
+    }}>3</button>
+    
+    <Todo id={selectedId} />
+  </div>
+}
 
-  },[])
+function Todo({id}) {
+  const [todo, setTodo] = useState({});
+
+  // implement effect here
+  useEffect(() => {
+    setTimeout(() => {
+      axios.get(`https://sum-server.100xdevs.com/todo?id=${id}`)
+        .then(response => {
+          setTodo(response.data.todo)
+        })
+    } , 5000)
+  }, [id])
+
   return <div>
-  {todos.map(todo => <Todo key ={todo.id} title={todo.title} description={todo.description}></Todo>)}
-
-  </div>
-  
-}
-
-
-function Todo({title,description}){
-  return(
-  <div>
-<h1>
-  {title}
-</h1>
-<h4>
-  {description}
-  </h4>
-
-
-  </div>
-  );
-
-}
-
-
-function TextComponent(){
-  return <div>
-    hi there from text component
+    Id: {id}
+    <h1>
+      {todo.title}
+    </h1>
+    <h4>
+      {todo.description}
+    </h4>
   </div>
 }
 
-function CardWrapper({children}){
-  console.log(children)
-  return <div style={{border:"2px solid black", padding:20}}>
-      {children}
-  </div>
-
-}
-
-
-
-
-export default App
+export default App;
